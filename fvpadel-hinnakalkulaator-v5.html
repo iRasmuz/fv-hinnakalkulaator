@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ürituse hinnakalkulaator — FV Padel</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --g: #73FF5F;
+  --g-dim: rgba(115,255,95,.1);
+  --g-glow: rgba(115,255,95,.05);
+  --y: #F4DB00;
+  --y-dim: rgba(244,219,0,.1);
+  --b: #5B9FFF;
+  --b-dim: rgba(91,159,255,.1);
+  --bg: #0b0b0b;
+  --bg2: #111;
+  --card: #161616;
+  --card2: #1c1c1c;
+  --card3: #222;
+  --border: #282828;
+  --border2: #323232;
+  --muted: #555;
+  --muted2: #888;
+  --white: #fff;
+  --r: 16px;
+  --r-sm: 10px;
+  --r-btn: 100px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--white); font-family: 'Montserrat', sans-serif; min-height: 100vh; }
+
+/* ── HEADER ── */
+.hdr {
+  background: rgba(11,11,11,.96);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  padding: 18px 32px;
+  display: flex; align-items: center; justify-content: center;
+  position: sticky; top: 0; z-index: 100;
+}
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.logo-svg { height: 40px; width: auto; display: block; }
+.logo-mark {
+  font-family: 'Anton', sans-serif;
+  font-size: 22px; color: var(--white);
+  transform: skewX(-8deg); display: inline-block;
+  letter-spacing: -1px; line-height: 1;
+}
+.logo-sep { width: 1px; height: 16px; background: var(--b); opacity: .7; transform: skewX(-8deg); }
+.logo-name {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 10px; font-weight: 700;
+  color: var(--b); letter-spacing: 3.5px;
+  text-transform: uppercase; margin-top: 1px;
+}
+.hdr-url { font-size: 11px; color: var(--muted2); letter-spacing: .5px; }
+
+/* ── HERO ── */
+.hero {
+  padding: 52px 32px 44px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(150deg, #0b0b0b 55%, #0c0f18 100%);
+  position: relative; overflow: hidden;
+  text-align: center;
+}
+.hero::before {
+  content: '';
+  position: absolute; top: -60px; right: -100px;
+  width: 600px; height: 400px;
+  background: radial-gradient(ellipse at 60% 30%, rgba(91,159,255,.055) 0%, transparent 65%);
+  pointer-events: none;
+}
+.hero-eyebrow {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  font-size: 10px; font-weight: 700; letter-spacing: 3.5px;
+  text-transform: uppercase; color: var(--b); margin-bottom: 16px;
+}
+.hero-eyebrow::before { content: ''; width: 24px; height: 2px; background: var(--b); flex-shrink: 0; }
+.hero-eyebrow::after  { content: ''; width: 24px; height: 2px; background: var(--b); flex-shrink: 0; }
+.hero h1 {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(32px, 5.5vw, 56px);
+  line-height: .92; text-transform: uppercase;
+  margin-bottom: 18px; color: var(--white);
+}
+.hero h1 em { color: var(--b); font-style: normal; }
+.hero-sub { font-size: 13px; color: var(--muted2); max-width: 460px; line-height: 1.75; margin: 0 auto; }
+
+/* ── MAIN ── */
+.main { max-width: 900px; margin: 0 auto; padding: 36px 24px 80px; }
+.accent { width: 32px; height: 3px; background: var(--b); transform: skewX(-20deg); margin: 0 auto 24px; border-radius: 2px; }
+
+/* ── SECTIONS ── */
+.sec { margin-bottom: 10px; }
+.sec-label {
+  font-size: 10px; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 2.5px;
+  margin-bottom: 8px; text-align: center;
+}
+
+/* ── CARD ── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 20px 22px;
+  transition: border-color .2s;
+}
+.card-padel  { border-color: rgba(115,255,95,.15); }
+.card-tennis { border-color: rgba(244,219,0,.15); }
+.card-neutral { border-color: rgba(91,159,255,.1); }
+
+/* ── TOGGLES ── */
+.trow { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.t {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px; font-weight: 600;
+  padding: 7px 16px;
+  border-radius: var(--r-btn);
+  border: 1px solid var(--border2);
+  background: transparent; color: var(--muted2);
+  cursor: pointer; transition: all .15s;
+  text-transform: uppercase; letter-spacing: .4px; white-space: nowrap;
+}
+.t:hover:not(:disabled) { color: var(--white); border-color: #444; background: rgba(255,255,255,.04); }
+.t:disabled { opacity: .18; cursor: not-allowed; }
+/* Active states by sport */
+.t.on-center  { background: var(--white); border-color: var(--white); color: #000; }
+.t.on-padel   { background: var(--g); border-color: var(--g); color: #000; }
+.t.on-tennis  { background: var(--y); border-color: var(--y); color: #000; }
+.t.on-neutral { background: var(--b); border-color: var(--b); color: #fff; }
+.t.on-zero    { background: var(--card3); border-color: var(--border2); color: var(--muted2); }
+
+/* ── COURT GRID ── */
+.court-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.cs {
+  background: var(--card2);
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  padding: 16px 18px;
+}
+.cs-padel  { border-top: 2px solid rgba(115,255,95,.35); }
+.cs-tennis { border-top: 2px solid rgba(244,219,0,.45); }
+.cs-head   { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px; }
+.cs-title  { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
+.cs-title.c-padel  { color: var(--g); }
+.cs-title.c-tennis { color: var(--y); }
+.badge-pill {
+  font-size: 9px; font-weight: 700; letter-spacing: .5px;
+  text-transform: uppercase; padding: 2px 7px;
+  border-radius: 100px;
+}
+.badge-prem { background: var(--g); color: #000; }
+.cs-sub { font-size: 10px; color: var(--muted); margin-top: 9px; line-height: 1.4; text-align: center; }
+
+/* ── COLOR LEGEND ── */
+.legend {
+  display: flex; gap: 18px; flex-wrap: wrap; justify-content: center;
+  margin-top: 14px; padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+.leg { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--muted); }
+.leg-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── FORM ── */
+.frow { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 12px; }
+.frow:last-child { margin-bottom: 0; }
+.frow label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; min-width: 80px; text-align: right; }
+.time-row { display: flex; align-items: center; gap: 8px; }
+select {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px; font-weight: 500;
+  background: var(--card3); color: var(--white);
+  border: 1px solid var(--border2); border-radius: var(--r-sm);
+  padding: 9px 12px; cursor: pointer; outline: none;
+  transition: border-color .15s; flex: 1; max-width: 200px;
+}
+select:focus { border-color: var(--b); }
+.time-sep { color: var(--muted); font-size: 20px; font-weight: 200; }
+
+/* ── TRAINER BADGE ── */
+.tr-badge {
+  margin-top: 12px; padding: 10px 14px;
+  background: var(--b-dim); border-left: none;
+  border: 1px solid rgba(91,159,255,.2);
+  border-radius: var(--r-sm);
+  font-size: 12px; color: var(--b); font-weight: 500; text-align: center;
+}
+
+/* ── RESULT ── */
+.result {
+  background: linear-gradient(135deg, #0c0c0c 0%, #0c0f1a 100%);
+  border: 1px solid rgba(91,159,255,.28);
+  border-radius: var(--r);
+  padding: 28px 28px 24px;
+  margin: 20px 0 8px;
+  position: relative; overflow: hidden;
+  box-shadow: 0 0 80px rgba(91,159,255,.04), inset 0 1px 0 rgba(91,159,255,.08);
+}
+.result::after {
+  content: '';
+  position: absolute; top: -30px; right: -30px;
+  width: 160px; height: 160px;
+  background: radial-gradient(ellipse, rgba(91,159,255,.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+.r-label { font-size: 10px; font-weight: 700; color: var(--b); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 8px; text-align: center; }
+.r-price { font-family: 'Anton', sans-serif; font-size: 62px; line-height: 1; letter-spacing: -2px; color: var(--white); text-align: center; }
+.r-sub { font-size: 12px; color: var(--muted2); margin-top: 12px; font-weight: 500; line-height: 1.6; text-align: center; }
+
+/* ── BREAKDOWN ── */
+.bk {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 0 22px; margin-bottom: 8px;
+}
+.br {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 13px 0; border-bottom: 1px solid var(--border);
+  font-size: 13px; color: var(--muted2); gap: 12px;
+}
+.br:last-child { border-bottom: none; }
+.br.tot { font-weight: 700; font-size: 14px; color: var(--white); }
+.br .bv { font-weight: 600; color: var(--white); font-size: 14px; flex-shrink: 0; }
+.br.tot .bv { color: #FF4444; font-size: 18px; }
+.itag {
+  font-size: 9px; font-weight: 700; letter-spacing: .5px;
+  text-transform: uppercase; padding: 2px 6px;
+  border-radius: 4px; margin-left: 6px; vertical-align: middle;
+}
+.itag-p  { background: var(--g-dim); color: var(--g); }
+.itag-pp { background: var(--g); color: #000; }
+.itag-t  { background: var(--y-dim); color: var(--y); }
+.itag-tr { background: var(--b-dim); color: var(--b); }
+
+/* ── NOTE ── */
+.note {
+  font-size: 11px; color: var(--muted);
+  padding: 11px 16px; background: var(--card);
+  border-radius: var(--r-sm); border: 1px solid var(--border);
+  line-height: 1.65; margin-bottom: 8px; text-align: center;
+}
+
+/* ── ERROR ── */
+.err {
+  font-size: 12px; font-weight: 600; color: #ff6b6b;
+  padding: 10px 14px; background: rgba(255,107,107,.07);
+  border-left: 2px solid #ff6b6b;
+  border-radius: 0 var(--r-sm) var(--r-sm) 0; margin-top: 10px;
+}
+
+.hidden { display: none !important; }
+
+/* ── FOOTER ── */
+.ftr {
+  border-top: 1px solid var(--border);
+  padding: 28px 32px;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 14px; text-align: center;
+}
+.ftr-logo { display: flex; align-items: center; opacity: .7; }
+.ftr-logo-svg { height: 40px; width: auto; display: block; }
+.ftr-txt { font-size: 11px; color: var(--muted); line-height: 1.65; }
+.ftr-txt strong { color: var(--muted2); }
+
+@media (max-width: 640px) {
+  .hdr { padding: 14px 18px; }
+  .hero { padding: 36px 18px 32px; }
+  .main { padding: 24px 16px 60px; }
+  .court-grid { grid-template-columns: 1fr; }
+  .frow { flex-direction: column; align-items: center; gap: 7px; }
+  select { max-width: 100%; }
+  .r-price { font-size: 46px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="logo">
+    <img src="https://fvsport.ee/wp-content/uploads/2026/04/FV_valge.svg" alt="FV" class="logo-svg" onerror="this.style.display='none';document.getElementById('logo-fallback').style.display='flex'">
+    <div id="logo-fallback" style="display:none;align-items:center;gap:10px">
+      <span class="logo-mark">FV</span>
+      <span class="logo-sep"></span>
+      <span class="logo-name">Padel</span>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">Broneeri üritus</div>
+  <h1>Ürituse<br><em>hinna</em>kalkulaator</h1>
+  <p class="hero-sub">Vali keskus, väljakud, kellaaeg ja kestus — saad kohe ligikaudse hinna.</p>
+</div>
+
+<div class="main">
+<div class="accent"></div>
+
+<!-- KESKUS -->
+<div class="sec">
+  <div class="sec-label">Keskus</div>
+  <div class="card">
+    <div class="trow" id="ctrTog">
+      <button class="t on-center" data-c="jarvekyula" onclick="setC(this)">Järveküla</button>
+      <button class="t" data-c="viimsi" onclick="setC(this)">Viimsi</button>
+      <button class="t" data-c="kiili" onclick="setC(this)">Kiili</button>
+      <button class="t" data-c="peetri" onclick="setC(this)">Peetri</button>
+    </div>
+    <div class="legend">
+      <div class="leg"><div class="leg-dot" style="background:var(--g)"></div>Padel</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--y)"></div>Tennis</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--b)"></div>Muud valikud</div>
+    </div>
+  </div>
+</div>
+
+<!-- VÄLJAKUD -->
+<div class="sec">
+  <div class="sec-label">Väljakud</div>
+  <div class="card" style="padding:16px 18px">
+    <div class="court-grid" id="courtGrid">
+
+      <div class="cs cs-padel" id="padelRegSec">
+        <div class="cs-head">
+          <span class="cs-title c-padel">Tavaväljakud (Padel)</span>
+        </div>
+        <div class="trow" id="padelRegTog"></div>
+        <div class="cs-sub" id="padelRegSub"></div>
+      </div>
+
+      <div class="cs cs-padel" id="padelPremSec">
+        <div class="cs-head">
+          <span class="cs-title c-padel">Peaväljakud (Padel)</span>
+          <span class="badge-pill badge-prem">Premium</span>
+        </div>
+        <div class="trow" id="padelPremTog"></div>
+        <div class="cs-sub" id="padelPremSub"></div>
+      </div>
+
+      <div class="cs cs-tennis" id="tennisSec">
+        <div class="cs-head">
+          <span class="cs-title c-tennis">Tennisväljakud</span>
+        </div>
+        <div class="trow" id="tennisTog"></div>
+        <div class="cs-sub" id="tennisSub"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- TREENER -->
+<div class="sec hidden" id="trainerSec">
+  <div class="sec-label">Treener (padel)</div>
+  <div class="card card-neutral">
+    <div class="trow" id="trTog">
+      <button class="t on-neutral" data-t="no" onclick="setT(this)">Ilma treenerita</button>
+      <button class="t" data-t="yes" onclick="setT(this)">Treeneriga</button>
+    </div>
+    <div id="trBadge"></div>
+  </div>
+</div>
+
+<!-- PÄEV -->
+<div class="sec">
+  <div class="sec-label">Päev</div>
+  <div class="card card-neutral">
+    <div class="trow" id="dayTog">
+      <button class="t on-neutral" data-d="weekday" onclick="setD(this)">Argipäev (E–R)</button>
+      <button class="t" data-d="saturday" onclick="setD(this)">Laupäev</button>
+      <button class="t" data-d="sunday" onclick="setD(this)">Pühapäev</button>
+    </div>
+  </div>
+</div>
+
+<!-- AEG -->
+<div class="sec">
+  <div class="sec-label">Aeg</div>
+  <div class="card card-neutral">
+    <div class="frow">
+      <label>Algusaeg</label>
+      <div class="time-row">
+        <select id="startH" onchange="calc()"></select>
+        <span class="time-sep">:</span>
+        <select id="startM" onchange="calc()" style="max-width:78px">
+          <option value="0">00</option>
+          <option value="30">30</option>
+        </select>
+      </div>
+    </div>
+    <div class="frow">
+      <label>Kestus</label>
+      <select id="dur" onchange="calc()">
+        <option value="1">1 tund</option>
+        <option value="1.5">1,5 tundi</option>
+        <option value="2" selected>2 tundi</option>
+        <option value="2.5">2,5 tundi</option>
+        <option value="3">3 tundi</option>
+        <option value="3.5">3,5 tundi</option>
+        <option value="4">4 tundi</option>
+        <option value="5">5 tundi</option>
+        <option value="6">6 tundi</option>
+        <option value="8">8 tundi</option>
+      </select>
+    </div>
+    <div id="errBox"></div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="result">
+  <div class="r-label">Hinnanguline kogumaksumus</div>
+  <div class="r-price" id="totalEl">—</div>
+  <div class="r-sub" id="subEl">Vali vähemalt üks väljak</div>
+</div>
+
+<div class="bk" id="bkEl"></div>
+<div class="note" id="noteEl"></div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="ftr">
+  <div class="ftr-logo">
+    <img src="https://fvsport.ee/wp-content/uploads/2026/04/FV_valge.svg" alt="FV" class="ftr-logo-svg" onerror="this.style.display='none';document.getElementById('ftr-fallback').style.display='flex'">
+    <div id="ftr-fallback" style="display:none;align-items:center;gap:8px">
+      <span style="font-family:Anton,sans-serif;font-size:22px;transform:skewX(-8deg);display:inline-block">FV</span>
+      <span style="font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--b)">PADEL</span>
+    </div>
+  </div>
+  <div class="ftr-txt">
+    Hinnad on informatiivsed ja mõeldud esialgse kalkulatsiooni jaoks.<br>
+    Täpse pakkumise saamiseks: <strong>info@fvpadel.ee</strong>
+  </div>
+</footer>
+
+<script>
+const D = {
+  jarvekyula: {
+    name:'Järveküla', maxReg:7, maxPrem:1,
+    premLabel:'Väljak nr 1 (Belief)', regSub:'Väljakud nr 2–8',
+    padel:{
+      reg:{
+        weekday:[[360,480,32],[480,960,36],[960,1260,50],[1260,1350,38],[1350,1440,32]],
+        saturday:[[360,540,32],[540,1260,42],[1260,1350,36],[1350,1440,32]],
+        sunday:[[360,540,32],[540,1260,42],[1260,1350,36],[1350,1440,32]]
+      },
+      prem:{
+        weekday:[[360,480,36],[480,960,40],[960,1260,54],[1260,1350,42],[1350,1440,36]],
+        saturday:[[360,540,36],[540,1260,46],[1260,1350,40],[1350,1440,36]],
+        sunday:[[360,540,36],[540,1260,46],[1260,1350,40],[1350,1440,36]]
+      }
+    }
+  },
+  viimsi:{
+    name:'Viimsi', maxReg:5, maxPrem:2,
+    premLabel:'Väljakud nr 2, 3', regSub:'Väljakud nr 1, 4, 5, 6, 7',
+    padel:{
+      reg:{
+        weekday:[[360,480,32],[480,960,36],[960,1260,50],[1260,1350,36],[1350,1410,32],[1410,1440,32]],
+        saturday:[[360,540,32],[540,1260,40],[1260,1350,36],[1350,1410,32],[1410,1440,32]],
+        sunday:[[360,540,32],[540,1260,40],[1260,1350,36],[1350,1410,32],[1410,1440,32]]
+      },
+      prem:{
+        weekday:[[360,480,36],[480,960,40],[960,1260,54],[1260,1350,40],[1350,1410,36],[1410,1440,36]],
+        saturday:[[360,540,36],[540,1260,44],[1260,1350,40],[1350,1410,36],[1410,1440,36]],
+        sunday:[[360,540,36],[540,1260,44],[1260,1350,40],[1350,1410,36],[1410,1440,36]]
+      }
+    }
+  },
+  kiili:{
+    name:'Kiili', maxReg:4, maxPrem:0,
+    regSub:'Väljakud nr 1–4',
+    padel:{
+      reg:{
+        weekday:[[360,960,30],[960,1260,44],[1260,1410,30],[1410,1440,30]],
+        saturday:[[360,540,25],[540,1410,30],[1410,1440,30]],
+        sunday:[[360,540,25],[540,1410,30],[1410,1440,30]]
+      }
+    },
+    tennis:{
+      maxCourts:2, sub:'Tennis 1–2',
+      slots:{
+        weekday:[[360,480,20],[480,960,35],[960,1260,50],[1260,1350,30],[1350,1440,30]],
+        saturday:[[360,480,20],[480,960,35],[960,1260,50],[1260,1350,30],[1350,1440,30]],
+        sunday:[[360,480,20],[480,960,35],[960,1260,50],[1260,1350,30],[1350,1440,30]]
+      }
+    }
+  },
+  peetri:{
+    name:'Peetri', maxReg:0, maxPrem:0,
+    tennis:{
+      maxCourts:3, sub:'Tennis 1–3',
+      slots:{
+        weekday:[[360,480,20],[480,960,35],[960,1260,50],[1260,1350,30],[1350,1440,20]],
+        saturday:[[360,510,20],[510,1260,25],[1260,1440,20]],
+        sunday:[[360,510,20],[510,1260,30],[1260,1440,20]]
+      }
+    }
+  }
+};
+
+function trInfo(n){
+  if(n===1) return {rate:65,label:'1 treener · 1 väljak (65 €/h)'};
+  if(n===2) return {rate:95,label:'1 treener · 2 väljakut (95 €/h)'};
+  if(n<=4)  return {rate:110,label:'1 treener · 3–4 väljakut (110 €/h)'};
+  return {rate:220,label:'2 treenerit · 5–8 väljakut (2 × 110 €/h)'};
+}
+
+let center='jarvekyula', dayType='weekday', withTrainer=false;
+let pReg=0, pPrem=0, tN=0;
+
+function buildTog(el, max, key, cls){
+  el.innerHTML='';
+  for(let i=0;i<=max;i++){
+    const b=document.createElement('button');
+    b.className='t '+(i===0?'on-zero':'');
+    b.textContent=i;
+    b.dataset.val=i; b.dataset.key=key;
+    b.onclick=()=>{
+      el.querySelectorAll('.t').forEach(x=>x.className='t '+(parseInt(x.dataset.val)===0?'on-zero':''));
+      b.className='t '+(i===0?'on-zero':cls);
+      if(key==='reg') pReg=i;
+      if(key==='prem') pPrem=i;
+      if(key==='tennis') tN=i;
+      updateTrainer(); calc();
+    };
+    el.appendChild(b);
+  }
+}
+
+function renderCenter(){
+  const cd=D[center];
+  const hasPad='padel' in cd, hasTen='tennis' in cd, hasPrem=cd.maxPrem>0;
+  pReg=0; pPrem=0; tN=0;
+
+  const prS=document.getElementById('padelRegSec');
+  const ppS=document.getElementById('padelPremSec');
+  const tS=document.getElementById('tennisSec');
+
+  if(hasPad && cd.maxReg>0){
+    prS.classList.remove('hidden');
+    document.getElementById('padelRegSub').textContent=cd.regSub||'';
+    buildTog(document.getElementById('padelRegTog'), cd.maxReg, 'reg', 'on-padel');
+  } else { prS.classList.add('hidden'); }
+
+  if(hasPad && hasPrem){
+    ppS.classList.remove('hidden');
+    document.getElementById('padelPremSub').textContent=cd.premLabel||'';
+    buildTog(document.getElementById('padelPremTog'), cd.maxPrem, 'prem', 'on-padel');
+  } else { ppS.classList.add('hidden'); }
+
+  if(hasTen){
+    tS.classList.remove('hidden');
+    document.getElementById('tennisSub').textContent=cd.tennis.sub||'';
+    buildTog(document.getElementById('tennisTog'), cd.tennis.maxCourts, 'tennis', 'on-tennis');
+  } else { tS.classList.add('hidden'); }
+
+  updateTrainer(); calc();
+}
+
+function updateTrainer(){
+  const cd=D[center], total=pReg+pPrem;
+  const sec=document.getElementById('trainerSec');
+  if('padel' in cd && total>0){
+    sec.classList.remove('hidden');
+    const badge=document.getElementById('trBadge');
+    if(withTrainer){
+      const ti=trInfo(total);
+      badge.innerHTML=`<div class="tr-badge">⚡ ${ti.label} — lisandub väljakuhinnale</div>`;
+    } else { badge.innerHTML=''; }
+  } else {
+    sec.classList.add('hidden');
+    withTrainer=false;
+    document.querySelectorAll('#trTog .t').forEach((b,i)=>{
+      b.className='t '+(i===0?'on-neutral':'');
+    });
+  }
+}
+
+function setC(b){
+  document.querySelectorAll('#ctrTog .t').forEach(x=>x.classList.remove('on-center'));
+  b.classList.add('on-center'); center=b.dataset.c; renderCenter();
+}
+function setD(b){
+  document.querySelectorAll('#dayTog .t').forEach(x=>x.classList.remove('on-neutral'));
+  b.classList.add('on-neutral'); dayType=b.dataset.d; calc();
+}
+function setT(b){
+  document.querySelectorAll('#trTog .t').forEach(x=>x.classList.remove('on-neutral'));
+  b.classList.add('on-neutral'); withTrainer=b.dataset.t==='yes';
+  updateTrainer(); calc();
+}
+
+function mts(m){
+  if(m>=1440) return '24:00';
+  const h=Math.floor(m/60), mm=m%60;
+  return (h<10?'0'+h:h)+':'+(mm===0?'00':'30');
+}
+function slots(arr, count, sMin, eMin){
+  let total=0, rows=[];
+  for(const [s,e,r] of arr){
+    const oS=Math.max(sMin,s), oE=Math.min(eMin,e);
+    if(oE<=oS) continue;
+    const hrs=(oE-oS)/60, cost=r*count*hrs;
+    total+=cost;
+    rows.push({time:mts(oS)+'–'+mts(oE),count,rate:r,hrs,cost});
+  }
+  return {total,rows};
+}
+
+function calc(){
+  const sMin=parseInt(document.getElementById('startH').value)*60+parseInt(document.getElementById('startM').value);
+  const dur=parseFloat(document.getElementById('dur').value);
+  const eMin=sMin+dur*60;
+  const errEl=document.getElementById('errBox');
+  errEl.innerHTML='';
+
+  if(eMin>1440){
+    errEl.innerHTML='<div class="err">Üritus ületab 24:00 — vali lühem kestus või varasem algusaeg.</div>';
+    document.getElementById('totalEl').textContent='—';
+    document.getElementById('bkEl').innerHTML='';
+    document.getElementById('noteEl').textContent='';
+    return;
+  }
+
+  const cd=D[center];
+  if(pReg+pPrem+tN===0){
+    document.getElementById('totalEl').textContent='—';
+    document.getElementById('subEl').textContent='Vali vähemalt üks väljak';
+    document.getElementById('bkEl').innerHTML='';
+    document.getElementById('noteEl').textContent='';
+    return;
+  }
+
+  let grand=0, html='';
+  const parts=[];
+
+  if('padel' in cd && pReg>0){
+    const {total,rows}=slots(cd.padel.reg[dayType]||cd.padel.reg.weekday, pReg, sMin, eMin);
+    grand+=total;
+    rows.forEach(r=>{
+      html+=`<div class="br"><span>Padel ${r.time} · ${r.count}×${r.rate}€/h × ${r.hrs.toFixed(r.hrs%1?1:0)}h<span class="itag itag-p">PADEL</span></span><span class="bv">${Math.round(r.cost)} €</span></div>`;
+    });
+    parts.push(`${pReg} tavaväljak${pReg>1?'ut':''}`);
+  }
+
+  if('padel' in cd && pPrem>0){
+    const {total,rows}=slots(cd.padel.prem[dayType]||cd.padel.prem.weekday, pPrem, sMin, eMin);
+    grand+=total;
+    rows.forEach(r=>{
+      html+=`<div class="br"><span>Padel ${r.time} · ${r.count}×${r.rate}€/h × ${r.hrs.toFixed(r.hrs%1?1:0)}h<span class="itag itag-pp">PEAVÄLJAK</span></span><span class="bv">${Math.round(r.cost)} €</span></div>`;
+    });
+    parts.push(`${pPrem} peaväljak${pPrem>1?'ut':''}`);
+  }
+
+  if('tennis' in cd && tN>0){
+    const {total,rows}=slots(cd.tennis.slots[dayType]||cd.tennis.slots.weekday, tN, sMin, eMin);
+    grand+=total;
+    rows.forEach(r=>{
+      html+=`<div class="br"><span>Tennis ${r.time} · ${r.count}×${r.rate}€/h × ${r.hrs.toFixed(r.hrs%1?1:0)}h<span class="itag itag-t">TENNIS</span></span><span class="bv">${Math.round(r.cost)} €</span></div>`;
+    });
+    parts.push(`${tN} tennisväljak${tN>1?'ut':''}`);
+  }
+
+  const pTotal=pReg+pPrem;
+  if(withTrainer && pTotal>0){
+    const ti=trInfo(pTotal), cost=ti.rate*dur;
+    grand+=cost;
+    html+=`<div class="br"><span>⚡ ${ti.label} × ${dur}h<span class="itag itag-tr">TREENER</span></span><span class="bv">${Math.round(cost)} €</span></div>`;
+  }
+
+  html+=`<div class="br tot"><span>Kokku</span><span class="bv">${Math.round(grand)} €</span></div>`;
+
+  document.getElementById('totalEl').textContent=Math.round(grand)+' €';
+  document.getElementById('subEl').textContent=parts.join(' + ')+' · '+mts(sMin)+'–'+mts(eMin)+' · '+cd.name;
+  document.getElementById('bkEl').innerHTML=html;
+
+  const dl={weekday:'Argipäev E–R',saturday:'Laupäev',sunday:'Pühapäev'}[dayType];
+  let note=`${cd.name} · ${dl} · ${mts(sMin)}–${mts(eMin)}`;
+  if(!withTrainer && pTotal>0) note+=' · Treeneri tasu ei sisaldu';
+  if(center==='peetri'&&dayType!=='weekday') note+=' · NB: pühapäev on ~5 €/h kallim kui laupäev';
+  document.getElementById('noteEl').textContent=note;
+}
+
+// Init hour select
+const sh=document.getElementById('startH');
+for(let h=6;h<=23;h++){
+  const o=document.createElement('option');
+  o.value=h; o.textContent=h<10?'0'+h:h;
+  if(h===10) o.selected=true;
+  sh.appendChild(o);
+}
+renderCenter();
+</script>
+</body>
+</html>
